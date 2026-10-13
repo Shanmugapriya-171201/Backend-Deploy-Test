@@ -1,0 +1,27 @@
+# Optional Render Blueprint (infrastructure as code).
+# The deploy plan uses the Render dashboard; this file records the same settings
+# so the service can be recreated identically. Secrets marked sync: false are
+# entered in the dashboard, never committed here.
+services:
+  - type: web
+    name: datapulse-rehearsal-backend
+    runtime: python
+    region: singapore
+    plan: free
+    branch: main
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn main:app --app-dir backend --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
+    buildFilter:
+      paths:
+        - backend/**
+        - knowledge-base/**
+    envVars:
+      - key: INVESTIGATION_SECONDS
+        value: "20"
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: API_KEY
+        sync: false
+      - key: DUMMY_SECRET
+        sync: false
